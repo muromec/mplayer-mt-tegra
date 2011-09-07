@@ -121,6 +121,7 @@ extern struct vo_driver video_out_corevideo;
 extern struct vo_driver video_out_quartz;
 extern struct vo_driver video_out_pnm;
 extern struct vo_driver video_out_md5sum;
+extern struct vo_driver video_out_tegra;
 
 const struct vo_driver *video_out_drivers[] =
 {
@@ -250,6 +251,9 @@ const struct vo_driver *video_out_drivers[] =
 #endif
 #ifdef CONFIG_MD5SUM
         &video_out_md5sum,
+#endif
+#ifdef CONFIG_TEGRA
+        &video_out_tegra,
 #endif
         NULL
 };

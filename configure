@@ -667,6 +667,7 @@ _tdfxvid=no
 _xvr100=auto
 _tga=yes
 _directfb=auto
+tegra=no
 _bl=no
 #language=en
 _shm=auto
@@ -1066,6 +1067,8 @@ for ac_option do
   --enable-tga)         _tga=yes        ;;
   --enable-directfb)    _directfb=yes   ;;
   --disable-directfb)   _directfb=no    ;;
+  --enable-tegra)       tegra=yes       ;;
+  --disable-tegra)      tegra=no        ;;
   --enable-bl)          _bl=yes         ;;
   --disable-bl)         _bl=no          ;;
   --enable-mtrr)        _mtrr=yes       ;;
@@ -3805,6 +3808,16 @@ else
   novomodules="directfb dfbmga $novomodules"
 fi
 echores "$_directfb"
+
+echocheck "tegra"
+if test "$tegra" = yes; then
+    def_tegra='#define CONFIG_TEGRA'
+    vomodules="tegra $vomodules"
+else
+    def_tegra='#undef CONFIG_TEGRA'
+    novomodules="tegra"
+fi
+echores "$tegra"
 
 
 echocheck "X11 headers presence"
@@ -6714,6 +6727,7 @@ DART = $_dart
 DGA = $_dga
 DIRECT3D = $_direct3d
 DIRECTFB = $_directfb
+TEGRA = $tegra
 DIRECTX = $_directx
 DVBIN = $_dvbin
 DVDNAV = $_dvdnav
@@ -7175,7 +7189,7 @@ $def_xss
 $def_xv
 $def_xvr100
 $def_yuv4mpeg
-
+$def_tegra
 
 /* FFmpeg */
 $def_ffmpeg
