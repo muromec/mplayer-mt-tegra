@@ -73,8 +73,8 @@ static int config(uint32_t width, uint32_t height, uint32_t d_width,
         int ret;
         char device[16];
 
-        image_height = d_height;
-	image_width = d_width;
+        image_height = height;
+	image_width = width;
 
         snprintf(device, 16, "/dev/tegra_dc_%d", output);
 
