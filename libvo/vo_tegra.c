@@ -73,8 +73,8 @@ static int config(uint32_t width, uint32_t height, uint32_t d_width,
         int ret;
         char device[16];
 
-        image_height = height;
-	image_width = width;
+        image_height = d_height;
+	image_width = d_width;
 
         snprintf(device, 16, "/dev/tegra_dc_%d", output);
 
@@ -192,7 +192,6 @@ uint8_t* nv_mmap(int size, int* offset) {
     if(buf == -1)
         perror("mmap failed");
 
-    printf("mmap %x\n", size);
     nv_mmap.handle = mem_handle;
     nv_mmap.offset = *offset;
     nv_mmap.length = size;
@@ -205,9 +204,7 @@ uint8_t* nv_mmap(int size, int* offset) {
         perror("nvmap mmap fail");
         exit(1);
     }
-    printf("mapped %x to %x (size %x)\n",
-            buf, buf+size, size);
-
+    
     *offset += size;
 
     return buf;
@@ -221,7 +218,7 @@ static void flip_page(void)
 }
 
 static int draw_slice(uint8_t * image[], int stride[], int w, int h,
-		int x, int y) {
+		int w_c, int h_c) {
 
 
         uint8_t *dst;
@@ -231,32 +228,14 @@ static int draw_slice(uint8_t * image[], int stride[], int w, int h,
 	memcpy_pic(dst, image[0], w, h, image_width,
 			stride[0]);
 
-        dst = video_buf[1];
-
-        printf("width: %d\n", w);
-
-        int i,_h;
-        uint8_t *_dst, *_src;
-        _dst = dst;
-        _src = image[1];
-        *(_src+416)=0;
-
-        for(_h=0;_h<h;_h++) {
-            for(i=0;i<w;i++) {
-                *dst = *(_src+i);
-            }
-            _src = _src + stride[0];
-            _dst = _dst + image_width/2;
-        }
-
-        /*
-	memcpy_pic(dst, image[1], w, h, 1,
-                        stride[1]);
 
         dst = video_buf[2];
-	memcpy_pic(dst, image[2], w, h, image_width/2,
+	memcpy_pic(dst, image[2], w_c, h_c, image_width/2,
                         stride[2]);
-                        */
+
+        dst = video_buf[1];
+	memcpy_pic(dst, image[1], w_c, h_c, image_width/2,
+                        stride[1]);
 
 	return 0;
 }
@@ -273,7 +252,7 @@ static uint32_t draw_image(mp_image_t * mpi)
 	else if (mpi->flags & MP_IMGFLAG_PLANAR)
 	{
 		//One plane per stride
-		draw_slice(mpi->planes, mpi->stride, mpi->w, mpi->h, 0, 0);
+		draw_slice(mpi->planes, mpi->stride, mpi->width, mpi->height, mpi->chroma_width, mpi->chroma_height);
 		return VO_TRUE;
 	} else if (mpi->flags & MP_IMGFLAG_YUV)
 	{
